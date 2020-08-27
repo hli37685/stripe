@@ -1,0 +1,102 @@
+{#
+/**
+ * Stripe Payments plugin for Craft CMS 3.x
+ *
+ * @link      https://enupal.com/
+ * @copyright Copyright (c) 2018 Enupal LLC
+ */
+#}
+
+{% extends "_layouts/cp" %}
+
+{% set title  = "Settings"|t %}
+{% set bodyClass = craft.app.request.getSegments()|slice(0, 3)|join(' ') %}
+
+{% set selectedSubnavItem = craft.app.request.getSegment(2) %}
+{% set selectedSidebarItem = craft.app.request.getSegment(3) %}
+{% set settings = craft.enupalStripe.getSettings %}
+
+{% set sidebar %}
+
+    <nav class="last">
+        <ul>
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/general') }}"
+                   {% if selectedSidebarItem == 'general' %}class="sel"{% endif %}><i
+                            class="fa fa-cc-stripe fa-fw" aria-hidden="true"></i>&nbsp;{{ "General"|t('enupal-stripe') }}
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/connect') }}"
+                   {% if selectedSidebarItem == 'connect' %}class="sel"{% endif %}><i
+                            class="fa fa-shopping-bag fa-fw" aria-hidden="true"></i>&nbsp;{{ "Connect"|t('enupal-stripe') }}
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/order-statuses') }}"
+                   {% if selectedSidebarItem == 'order-statuses' %}class="sel"{% endif %}><i
+                            class="fa fa-check-circle fa-fw" aria-hidden="true"></i>&nbsp;{{ "Order Statuses"|t('enupal-stripe') }}
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/taxes') }}"
+                   {% if selectedSidebarItem == 'taxes' %}class="sel"{% endif %}><i
+                            class="fa fa-percent fa-fw" aria-hidden="true"></i>&nbsp;{{ "Taxes"|t('enupal-stripe') }}
+                </a>
+            </li>
+
+            <li class="heading"><span>{{ "Subscriptions"|t('enupal-stripe') }}</span>
+            </li>
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/subscription-grants') }}"
+                   {% if selectedSidebarItem == 'subscription-grants' %}class="sel"{% endif %}><i
+                            class="fa fa-user fa-fw" aria-hidden="true"></i>&nbsp;{{ "Subscription Grants"|t('enupal-stripe') }}
+                </a>
+            </li>
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/subscriptions') }}"
+                   {% if selectedSidebarItem == 'subscriptions' %}class="sel"{% endif %}><i
+                            class="fa fa-calendar fa-fw" aria-hidden="true"></i>&nbsp;{{ "Subscription Plans"|t('enupal-stripe') }}
+                </a>
+            </li>
+
+            <li class="heading"><span>{{ "Advanced"|t('enupal-stripe') }}</span>
+            </li>
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/default') }}"
+                   {% if selectedSidebarItem == 'default' %}class="sel"{% endif %}><i
+                            class="fa fa-cog fa-fw" aria-hidden="true"></i>&nbsp;{{ "Defaults"|t('enupal-stripe') }}
+                </a>
+            </li>
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/notifications') }}" {% if selectedSidebarItem == 'notifications' %} class="sel" {% endif %}><i
+                            class="fa fa-envelope fa-fw" aria-hidden="true"></i>&nbsp;{{ "Customer Notifications"|t('enupal-stripe') }}
+                </a>
+            </li>
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/adminnotifications') }}" {% if selectedSidebarItem == 'adminnotifications' %} class="sel" {% endif %}><i
+                            class="fa fa-envelope fa-fw" aria-hidden="true"></i>&nbsp;{{ "Admin Notifications"|t('enupal-stripe') }}
+                </a>
+            </li>
+            {% if settings.enableConnect %}
+                <li>
+                    <a href="{{ cpUrl('enupal-stripe/settings/vendornotifications') }}" {% if selectedSidebarItem == 'vendornotifications' %} class="sel" {% endif %}><i
+                                class="fa fa-envelope fa-fw" aria-hidden="true"></i>&nbsp;{{ "Vendor Notifications"|t('enupal-stripe') }}
+                    </a>
+                </li>
+            {% endif %}
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/webhook') }}" {% if selectedSidebarItem == 'webhook' %} class="sel" {% endif %}><i class="fa fa-bell fa-fw" aria-hidden="true"></i>&nbsp;{{"Webhook"|t('enupal-stripe')}}</a>
+            </li>
+            <li>
+                <a href="{{ cpUrl('enupal-stripe/settings/syncorders') }}" {% if selectedSidebarItem == 'syncorders' %} class="sel" {% endif %}><i class="fa fa-refresh fa-fw" aria-hidden="true"></i>&nbsp;{{"Sync Orders"|t('enupal-stripe')}}</a>
+            </li>
+        </ul>
+    </nav>
+
+{% endset %}
+
+{% do view.registerAssetBundle("enupal\\stripe\\web\\assets\\FontAwesomeAsset") %}

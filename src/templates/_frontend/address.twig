@@ -1,0 +1,74 @@
+{% set typeTitle = type == 'address' ? 'Shipping Address'|t : 'Billing Address'|t  %}
+{% set countries = craft.enupalstripe.allCountriesAsList() %}
+
+<div class="col form-group">
+    <div class="heading">
+        <label for="{{ type }}Line1-{{ paymentForm.id }}">
+            {{ typeTitle }}
+        </label>
+    </div>
+    <div class="input">
+        <input id="{{ type }}Line1-{{ paymentForm.id }}" type="text" name="{{ type }}[line1]" placeholder="Street" required>
+    </div>
+</div>
+
+<div class="col form-group">
+    <div class="heading">
+        <label for="{{ type }}Name-{{ paymentForm.id }}">
+            {{ "Name"|t }}
+        </label>
+    </div>
+    <div class="input">
+        <input id="{{ type }}Name-{{ paymentForm.id }}" name="{{ type }}[name]" placeholder="Jenny Rosen" >
+    </div>
+</div>
+
+<div class="col form-group">
+    <div class="heading">
+        <label for="{{ type }}City-{{ paymentForm.id }}">
+            {{ "City"|t }}
+        </label>
+    </div>
+    <div class="input">
+        <input id="{{ type }}City-{{ paymentForm.id }}" type="text" name="{{ type }}[city]" placeholder="Coachella" required>
+    </div>
+</div>
+
+<div class="col form-group">
+    <div class="heading">
+        <label for="{{ type }}Zip-{{ paymentForm.id }}">
+            {{ "Zip"|t }}
+        </label>
+    </div>
+    <div class="input">
+        <input id="{{ type }}Zip-{{ paymentForm.id }}" type="text" name="{{ type }}[zip]" placeholder="92236" required>
+    </div>
+</div>
+
+<div class="col form-group">
+    <div class="heading">
+        <label for="{{ type }}State-{{ paymentForm.id }}">
+            {{ "State"|t }}
+        </label>
+    </div>
+    <div class="input">
+        <input id="{{ type }}State-{{ paymentForm.id }}" type="text" name="{{ type }}[state]" placeholder="CA" required>
+    </div>
+</div>
+
+<div class="col form-group">
+    <div class="heading">
+        <label for="{{ type }}Country-{{ paymentForm.id }}">
+            {{ "Country"|t }}
+        </label>
+    </div>
+    <div class="input">
+
+        <select required id="{{ type }}Country-{{ paymentForm.id }}" type="text" name="{{ type }}[country]">
+            {% for key, option in countries %}
+                {% set defaultCountry = 'US' %}
+                <option value="{{ key }}" {% if key == defaultCountry %} selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>

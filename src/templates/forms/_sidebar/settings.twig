@@ -1,0 +1,276 @@
+{#
+/**
+ * Stripe Payments plugin for Craft CMS 3.x
+ *
+ * @link      https://enupal.com/
+ * @copyright Copyright (c) 2018 Enupal LLC
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+<div class="meta">
+    {{ forms.textField({
+        first: true,
+        label: "Handle <span class='info'>How you’ll refer to this Stripe Form in the templates.</span>"|t('enupal-stripe'),
+        id: 'handle',
+        name: 'handle',
+        value: stripeForm.handle,
+        errors: stripeForm.getErrors('handle'),
+        autofocus: true,
+        required: true
+    }) }}
+
+    {{ forms.selectField({
+        label: "Language <span class='info'>Stripe currently supports 12 languages</span>"|t('enupal-stripe'),
+        id: 'language',
+        name: 'language',
+        options: languageOptions,
+        value: stripeForm.language
+    }) }}
+
+    {{ forms.selectField({
+        label: "Currency"|t('enupal-stripe'),
+        id: 'currency',
+        name: 'currency',
+        options: currencyOptions,
+        value: stripeForm.currency
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: "Enabled"|t('enupal-stripe'),
+        id: 'enabled',
+        name: 'enabled',
+        on: stripeForm.enabled
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: "Enable Stripe Checkout <span class='info'>Use <a href='https://stripe.com/checkout'>Stripe Checkout</a> if disable the payment form will be powered by <a href='https://stripe.com/elements'>Stripe Elements</a></span>"|t('enupal-stripe'),
+        id: 'enableCheckout',
+        name: 'enableCheckout',
+        on: stripeForm.enableCheckout
+    }) }}
+
+    {% set checkoutPaymentTypeInput %}
+        <div class="flex">
+            <div class="nowrapper">
+                {{ forms.checkboxGroup({
+                    name: "checkoutPaymentType",
+                    options : availableCheckoutPaymentTypes,
+                    values: checkoutPaymentTypeIdes
+                }) }}
+            </div>
+        </div>
+    {% endset %}
+
+    {% if (settings.useSca) and stripeForm.enableCheckout %}
+        {{ forms.field({
+            id: 'checkoutPaymentType',
+            label: "Payment Method <span class='info'>Remember to have the proper currency, e.g iDEAL only accepts EUR</span>"|t('enupal-stripe'),
+            errors: stripeForm.getErrors('checkoutPaymentType'),
+        }, checkoutPaymentTypeInput) }}
+    {% endif %}
+
+    {{ forms.textField({
+        label: "Checkout Success URL <span class='info'>Redirect buyers' to this URL after they complete their payments</span>"|t('enupal-stripe'),
+        id: 'checkoutSuccessUrl',
+        name: 'checkoutSuccessUrl',
+        value: stripeForm.checkoutSuccessUrl,
+        placeholder: '/thank-you?number={number}',
+        autofocus: true,
+        errors: stripeForm.getErrors('checkoutSuccessUrl')
+    }) }}
+
+    {{ forms.textField({
+        label: "Checkout Cancel URL <span class='info'>Redirect buyers' to this URL after they cancel their payments</span>"|t('enupal-stripe'),
+        id: 'checkoutCancelUrl',
+        name: 'checkoutCancelUrl',
+        value: stripeForm.checkoutCancelUrl,
+        placeholder: '/checkout-cancel',
+        autofocus: true,
+        errors: stripeForm.getErrors('checkoutCancelUrl')
+    }) }}
+
+    {{ forms.selectField({
+        label: "Checkout Submit Type <span class='info'>Describes the type of transaction being performed by Checkout in order to customize relevant text on the page, such as the submit button. submit_type can only be specified on Checkout Sessions in payment mode, but not Checkout Sessions in subscription or setup mode</span>"|t('enupal-stripe'),
+        id: 'checkoutSubmitType',
+        name: 'checkoutSubmitType',
+        value: stripeForm.checkoutSubmitType,
+        options: craft.enupalstripe.getSubmitTypesAsOptions(),
+        errors: stripeForm.getErrors('checkoutSubmitType')
+    }) }}
+
+    {% set paymentTypeInput %}
+        <div class="flex">
+            <div class="nowrapper">
+                {{ forms.checkboxGroup({
+                    name: "paymentType",
+                    options : availablePaymentTypes,
+                    values: paymentTypeIdes
+                }) }}
+            </div>
+        </div>
+    {% endset %}
+
+    {{ forms.field({
+        id: 'paymentType',
+        label: "Payment Method <span class='info'>Powered by Stripe Elements</span>"|t('enupal-stripe'),
+        errors: stripeForm.getErrors('paymentType'),
+    }, paymentTypeInput) }}
+
+    {% if (settings.useSca) and not stripeForm.enableCheckout %}
+        <span id="sca-warning" class="code error">{{ "The card element does not support SCA yet, please make sure to enable Stripe Checkout."|t('enupal-stripe') }}</span>
+    {% endif %}
+
+</div>
+
+<div id="one-time-payment-wrapper" class="meta {% if stripeForm.enableSubscriptions %} hidden {% endif %}">
+
+    {{ forms.selectField({
+        label: "Amount Type"|t('enupal-stripe'),
+        id: 'amountType',
+        name: 'amountType',
+        options: amountTypeOptions,
+        value: stripeForm.amountType
+    }) }}
+
+    {{ forms.textField({
+        first: true,
+        label: "Amount Label <span class='info'>Custom amount label</span>"|t('enupal-stripe'),
+        id: 'customAmountLabel',
+        name: 'customAmountLabel',
+        placeholder: 'Pay what you want:',
+        value: stripeForm.customAmountLabel,
+        errors: stripeForm.getErrors('customAmountLabel')
+    }) }}
+
+    {{ forms.textField({
+        first: true,
+        label: "Minimum Amount <span class='info'>Minimum custom amount</span>"|t('enupal-stripe'),
+        id: 'minimumAmount',
+        name: 'minimumAmount',
+        placeholder: 'Enter amount',
+        unit: stripeForm.currency,
+        value: (stripeForm.minimumAmount == '0' ? '0'|number : (stripeForm.minimumAmount ? stripeForm.minimumAmount|number ?: '')),
+        errors: stripeForm.getErrors('minimumAmount'),
+        autofocus: true,
+    }) }}
+
+    {{ forms.textField({
+        first: true,
+        label: "Amount"|t('enupal-stripe'),
+        id: 'amount',
+        name: 'amount',
+        placeholder: 'Enter amount',
+        unit: stripeForm.currency,
+        value: (stripeForm.amount == '0' ? '0'|number : (stripeForm.amount ? stripeForm.amount|number ?: '')),
+        errors: stripeForm.getErrors('amount'),
+        autofocus: true,
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: "Recurring Payment <span class='info'>Let the customer choose if this payment should be recurring.</span>"|t('enupal-stripe'),
+        id: 'enableRecurringPayment',
+        name: 'enableRecurringPayment',
+        on: stripeForm.enableRecurringPayment
+    }) }}
+
+    {{ forms.selectField({
+        label: "Interval <span class='info'>One of month or year. The frequency with which a custom amount should be billed</span>"|t('enupal-stripe'),
+        id: 'recurringPaymentType',
+        name: 'recurringPaymentType',
+        options: frequencyOptions,
+        value: stripeForm.recurringPaymentType
+    }) }}
+</div>
+
+<div class="meta">
+    {% set stockInput %}
+        <div class="flex">
+            <div class="textwrapper">
+                {{ forms.text({
+                    id: 'quantity',
+                    name: 'quantity',
+                    value: (stripeForm.hasUnlimitedStock ? '' : (stripeForm.quantity == '0' ? '0': (stripeForm.quantity ? stripeForm.quantity : ''))),
+                    placeholder: 'Enter stock'|t('enupal-stripe'),
+                    disabled: stripeForm.hasUnlimitedStock
+                }) }}
+            </div>
+            <div class="nowrap">
+                {{ forms.checkbox({
+                    id: 'unlimited-stock',
+                    class: 'unlimited-stock',
+                    label: 'Unlimited'|t('enupal-stripe'),
+                    name: 'hasUnlimitedStock',
+                    checked: stripeForm.hasUnlimitedStock,
+                }) }}
+            </div>
+        </div>
+    {% endset %}
+
+    {{ forms.field({
+        id: 'stock',
+        label: 'Stock'|t('enupal-stripe'),
+        errors: stripeForm.getErrors('hasUnlimitedStock')|merge(stripeForm.getErrors('quantity')),
+    }, stockInput) }}
+</div>
+
+<div class="meta">
+    {{ forms.lightswitchField({
+        label: "Shipping Address <span class='info'>Enables buyers to specify the Shipping Address</span>"|t('enupal-stripe'),
+        id: 'enableShippingAddress',
+        name: 'enableShippingAddress',
+        on: stripeForm.enableShippingAddress
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: "Billing Address <span class='info'>Enables buyers to specify the Billing Address</span>"|t('enupal-stripe'),
+        id: 'enableBillingAddress',
+        name: 'enableBillingAddress',
+        on: stripeForm.enableBillingAddress
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: "Verify Zip <span class='info'>Specify whether Checkout should validate the billing ZIP code</span>"|t('enupal-stripe'),
+        id: 'verifyZip',
+        name: 'verifyZip',
+        on: stripeForm.verifyZip
+    }) }}
+</div>
+
+<div class="meta">
+    {{ forms.textField({
+        label: "Return URL <span class='info'>Redirect buyers' to this URL after they complete their payments</span>"|t('enupal-stripe'),
+        id: 'returnUrl',
+        name: 'returnUrl',
+        value: stripeForm.returnUrl,
+        placeholder: '/order?number={number}',
+        autofocus: true,
+        errors: stripeForm.getErrors('returnUrl')
+    }) }}
+
+    {{ forms.textField({
+        label: "Submit Button Class <span class='info'>Add custom classes to your submit Button</span>"|t('enupal-stripe'),
+        id: 'buttonClass',
+        name: 'buttonClass',
+        value: stripeForm.buttonClass,
+        autofocus: true,
+        errors: stripeForm.getErrors('buttonClass')
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: "Custom Templates <span class='info'>Enable Custom Template Overrides Folder</span>"|t('enupal-stripe'),
+        id: 'enableTemplateOverrides',
+        name: 'enableTemplateOverrides',
+        on: stripeForm.enableTemplateOverrides
+    }) }}
+
+    {{ forms.textField({
+        label: "Templates Folder <span class='info'>The template folder to use for overrides</span>"|t('enupal-stripe'),
+        id: 'templateOverridesFolder',
+        name: 'templateOverridesFolder',
+        placeholder: '_stripe/'~stripeForm.handle,
+        value: stripeForm.templateOverridesFolder,
+        autofocus: true,
+        errors: stripeForm.getErrors('templateOverridesFolder')
+    }) }}
+</div>

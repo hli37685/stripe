@@ -1,0 +1,77 @@
+{#
+/**
+ * Stripe Payments plugin for Craft CMS 3.x
+ *
+ * @link      https://enupal.com/
+ * @copyright Copyright (c) 2018 Enupal LLC
+ */
+#}
+
+{% extends "enupal-stripe/_layouts/settings" %}
+{% import "_includes/forms" as forms %}
+
+{% set settings = settings is defined ? settings : craft.enupalStripe.getSettings()  %}
+{% set fullPageForm = true %}
+{% set saveShortcutRedirect = 'enupal-stripe/settings/taxes' %}
+
+{% set savePaymentForm %}
+    <div class="buttons">
+        <input class="btn submit" type="submit" value="{{ 'Save'|t }}">
+    </div>
+{% endset %}
+
+{% set content %}
+
+    <input type="hidden" name="action"
+           value="enupal-stripe/settings/save-settings">
+    <input type="hidden" name="stripeScenario" value="taxes">
+    <div id="settings-cp">
+
+        {% namespace 'settings' %}
+            {{ forms.field({
+                label: "Taxes"|t('enupal-stripe')|upper,
+                instructions: "Transaction-based tax"|t('enupal-stripe'),
+            }, null) }}
+            <hr>
+
+            {{ forms.lightswitchField({
+                first: true,
+                label: "Enable Taxes"|t('enupal-stripe'),
+                id: 'enableTaxes',
+                name: 'enableTaxes',
+                on: settings.enableTaxes,
+                onLabel: "Enable",
+                offLabel: "Disable",
+                errors: settings.getErrors('enableTaxes')
+            }) }}
+
+            {{ forms.textField({
+                first: true,
+                label: "Tax"|t('enupal-stripe'),
+                id: 'tax',
+                instructions: "Tax rate amount to apply to the payment. This is a positive decimal (with at most two decimal places) between 1 and 100"|t('enupal-stripe'),
+                name: 'tax',
+                placeholder: 'Enter percentage',
+                unit: '%',
+                value: settings.tax,
+                errors: settings.getErrors('tax'),
+                autofocus: true,
+            }) }}
+
+            {{ forms.lightswitchField({
+                first: true,
+                label: "Display Tax Label"|t('enupal-stripe'),
+                instructions: 'Display the Tax Amount in a label',
+                id: 'displayTaxLabel',
+                name: 'displayTaxLabel',
+                on: settings.displayTaxLabel,
+                onLabel: "Enable",
+                offLabel: "Disable",
+                errors: settings.getErrors('displayTaxLabel')
+            }) }}
+
+        {% endnamespace %}
+
+    </div>
+
+{% endset %}

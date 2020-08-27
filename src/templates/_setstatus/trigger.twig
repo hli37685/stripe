@@ -1,0 +1,9 @@
+<div class="btn menubtn">{{ "Set status"|t }}</div>
+{% set orderStatuses = craft.enupalStripe.getAllOrderStatuses() %}
+<div class="menu">
+    <ul>
+        {% for orderStatus in orderStatuses %}
+            <li><a class="formsubmit" data-param="status" data-value="{{ orderStatus.id }}"><span class="status {{ orderStatus.color }}"></span> {{ orderStatus.name|t }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

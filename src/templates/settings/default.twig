@@ -1,0 +1,158 @@
+{#
+/**
+ * Stripe Payments plugin for Craft CMS 3.x
+ *
+ * @link      https://enupal.com/
+ * @copyright Copyright (c) 2018 Enupal LLC
+ */
+#}
+
+{% extends "enupal-stripe/_layouts/settings" %}
+{% import "_includes/forms" as forms %}
+
+{% set settings = settings is defined ? settings : craft.enupalStripe.getSettings()  %}
+{% set fullPageForm = true %}
+{% set saveShortcutRedirect = 'enupal-stripe/settings/default' %}
+{% set currencyOptions = craft.enupalStripe.getCurrencyOptions() %}
+
+{% set savePaymentForm %}
+    <div class="buttons">
+        <input class="btn submit" type="submit" value="{{ 'Save'|t }}">
+    </div>
+{% endset %}
+
+{% set content %}
+
+    <input type="hidden" name="action"
+           value="enupal-stripe/settings/save-settings">
+
+    <div id="settings-cp">
+
+        {% namespace 'settings' %}
+            {{ forms.field({
+                label: "Default values"|t('enupal-stripe'),
+                instructions: "These are the default settings when create a new Payment Form and you can override it as per-form basis."|t('enupal-stripe'),
+            }, null) }}
+            <hr>
+            {{ forms.textField({
+                label: "Global Return URL"|t('enupal-stripe'),
+                instructions: "Redirect buyers' to this URL after they complete their payments"|t('enupal-stripe'),
+                id: 'returnUrl',
+                name: 'returnUrl',
+                placeholder: '/thank-you',
+                value: settings.returnUrl,
+                autofocus: true,
+                errors: settings.getErrors('returnUrl')
+            }) }}
+            <hr>
+
+            {{ forms.selectField({
+                id: 'defaultCurrency',
+                label: "Global Currency"|t('enupal-stripe'),
+                instructions: 'The currency of the payment'|t('enupal-stripe'),
+                name: 'defaultCurrency',
+                options: currencyOptions,
+                value: settings.defaultCurrency
+            }) }}
+
+            <hr>
+
+            {{ forms.lightswitchField({
+                label: 'Email address of the logged in user'|t('enupal-stripe'),
+                instructions: 'Get the email of the current user logged in. This disallow the user edit the email in the Stripe Checkout Form',
+                id: 'currentUserEmail',
+                name: 'currentUserEmail',
+                on: settings.currentUserEmail,
+                onLabel: "On"|t('enupal-stripe'),
+                offLabel: "Off"|t('enupal-stripe'),
+                errors: settings.getErrors('currentUserEmail'),
+            }) }}
+
+            <hr>
+
+            {{ forms.lightswitchField({
+                label: 'Update customer email on Stripe'|t('enupal-stripe'),
+                instructions: 'Update the customer email in Stripe if the Craft user email is updated and has orders associated',
+                id: 'updateCustomerEmailOnStripe',
+                name: 'updateCustomerEmailOnStripe',
+                on: settings.updateCustomerEmailOnStripe,
+                onLabel: "On"|t('enupal-stripe'),
+                offLabel: "Off"|t('enupal-stripe'),
+                errors: settings.getErrors('updateCustomerEmailOnStripe'),
+            }) }}
+
+            <hr>
+
+            {{ forms.lightswitchField({
+                label: 'Retrieve plans with a nickname'|t('enupal-stripe'),
+                instructions: 'If enabled Stripe Payments will retrieve just plans that have the nickname set',
+                id: 'plansWithNickname',
+                name: 'plansWithNickname',
+                on: settings.plansWithNickname,
+                onLabel: "On"|t('enupal-stripe'),
+                offLabel: "Off"|t('enupal-stripe'),
+                errors: settings.getErrors('plansWithNickname'),
+            }) }}
+
+            <hr>
+
+            {{ forms.lightswitchField({
+                label: 'Load Jquery'|t('enupal-stripe'),
+                instructions: 'If disabled it will prevent load Jquery. Please make sure Jquery is loaded in your site.',
+                id: 'loadJquery',
+                name: 'loadJquery',
+                on: settings.loadJquery,
+                onLabel: "On"|t('enupal-stripe'),
+                offLabel: "Off"|t('enupal-stripe'),
+                errors: settings.getErrors('loadJquery'),
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: 'Load Css'|t('enupal-stripe'),
+                instructions: 'If disabled it will prevent load default CSS styles',
+                id: 'loadCss',
+                name: 'loadCss',
+                on: settings.loadCss,
+                onLabel: "On"|t('enupal-stripe'),
+                offLabel: "Off"|t('enupal-stripe'),
+                errors: settings.getErrors('loadCss'),
+            }) }}
+
+            <hr>
+
+            {{ forms.lightswitchField({
+                label: 'Cancel subscription at period end'|t('enupal-stripe'),
+                instructions: 'By default, the cancellation takes effect immediately. Once a customer’s subscription is canceled, no further invoices are generated for that subscription. If the customer paid for the entire billing period and the subscription was canceled part-way through, the customer is not credited a refund automatically by Stripe. Note that, for metered plans, all reported usage is discarded.
+If you instead want to cancel the subscription at the end of the current billing period (i.e., for the duration of time the customer has already paid for), enable this setting',
+                id: 'cancelAtPeriodEnd',
+                name: 'cancelAtPeriodEnd',
+                on: settings.cancelAtPeriodEnd,
+                onLabel: "On"|t('enupal-stripe'),
+                offLabel: "Off"|t('enupal-stripe'),
+                errors: settings.getErrors('cancelAtPeriodEnd'),
+            }) }}
+
+            <hr>
+            {{ forms.textField({
+                label: "Charge Description"|t('enupal-stripe'),
+                instructions: " It is displayed when in the web interface alongside the charge. Note that if you use Stripe to send automatic email receipts to your customers, your receipt emails will include the description of the charge(s) that they are describing."|t('enupal-stripe'),
+                id: 'chargeDescription',
+                name: 'chargeDescription',
+                value: settings.chargeDescription,
+                errors: settings.getErrors('chargeDescription')
+            }) }}
+
+            <hr>
+            {{ forms.textField({
+                label: "One time set-up fee label"|t('enupal-stripe'),
+                instructions: "It is displayed when a one-time setup fee to a subscription and the new Stripe Checkout is enabled"|t('enupal-stripe'),
+                id: 'oneTimeSetupFeeLabel',
+                name: 'oneTimeSetupFeeLabel',
+                value: settings.oneTimeSetupFeeLabel,
+                errors: settings.getErrors('oneTimeSetupFeeLabel')
+            }) }}
+        {% endnamespace %}
+
+    </div>
+
+{% endset %}
